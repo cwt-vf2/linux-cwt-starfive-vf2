@@ -1,0 +1,58 @@
+Subject: [PATCH 6.12 8/8] crypto: af_alg - Fix page reassignment overflow in af_alg_pull_tsgl
+Date: Wed, 29 Apr 2026 23:07:02 -0700
+Message-ID: <20260430060702.110091-9-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260430060702.110091-1-ebiggers@kernel.org>
+References: <20260430060702.110091-1-ebiggers@kernel.org>
+Precedence: bulk
+X-Mailing-List: stable@vger.kernel.org
+List-Id: <stable.vger.kernel.org>
+List-Subscribe: <mailto:stable+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:stable+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+From: Herbert Xu <herbert@gondor.apana.org.au>
+
+commit 31d00156e50ecad37f2cb6cbf04aaa9a260505ef upstream.
+
+When page reassignment was added to af_alg_pull_tsgl the original
+loop wasn't updated so it may try to reassign one more page than
+necessary.
+
+Add the check to the reassignment so that this does not happen.
+
+Also update the comment which still refers to the obsolete offset
+argument.
+
+Reported-by: syzbot+d23888375c2737c17ba5@syzkaller.appspotmail.com
+Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ crypto/af_alg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 6867d177f2a2..b61c3ba126ed 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -703,12 +703,12 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst)
+ 
+ 			/*
+ 			 * Assumption: caller created af_alg_count_tsgl(len)
+ 			 * SG entries in dst.
+ 			 */
+-			if (dst) {
+-				/* reassign page to dst after offset */
++			if (dst && plen) {
++				/* reassign page to dst */
+ 				get_page(page);
+ 				sg_set_page(dst + j, page, plen, sg[i].offset);
+ 				j++;
+ 			}
+ 
+-- 
+2.54.0
+
+

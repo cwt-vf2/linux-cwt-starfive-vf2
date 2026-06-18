@@ -4,7 +4,7 @@ pkgbase=linux-cwt-6.12-starfive-vf2
 _variant=cwt #6.12-VF2-xxx-x
 pkgver=6.0.0
 epoch=25 #Based on cwt image version
-pkgrel=2
+pkgrel=3
 _tag=JH7110_VF2_6.12_v${pkgver}
 _desc='Linux 6.12.x (-cwt) for StarFive RISC-V VisionFive 2 Board'
 _srcname=linux-$_tag
@@ -22,6 +22,12 @@ source=("https://github.com/starfive-tech/linux/archive/refs/tags/${_tag}.tar.gz
   'linux-05-fix_img_gpu_secondary_notintermediate_conflict.patch'
   'linux-06-fix_drm_img_rogue_buffer_overflow.patch'
   'linux-07-fix_starfive_v4l2_for_6.12_kernel.patch'
+  'linux-08-af_alg-crypto-scatterwalk-Backport-memcpy_sglist.patch'
+  'linux-09-af_alg-crypto-algif_aead-use-memcpy_sglist-instead-of-null-skcipher.patch'
+  'linux-10-af_alg-crypto-algif_aead-Revert-to-operating-out-of-place.patch'
+  'linux-11-af_alg-crypto-algif_aead-snapshot-IV-for-async-AEAD-requests.patch'
+  'linux-12-af_alg-crypto-authenc-use-memcpy_sglist-instead-of-null-skcipher.patch'
+  'linux-15-af_alg-crypto-af_alg-Fix-page-reassignment-overflow.patch'
   'https://cdn.kernel.org/pub/linux/kernel/v6.x/incr/patch-6.12.5-6.xz'
   'https://cdn.kernel.org/pub/linux/kernel/v6.x/incr/patch-6.12.6-7.xz'
   'https://cdn.kernel.org/pub/linux/kernel/v6.x/incr/patch-6.12.7-8.xz'
@@ -54,6 +60,12 @@ b2sums=('037e32e0de20eaffab5e53b3528e18925435574813f65be4567e583de2b3e06b9d1b114
         '4d5bc3ef01fdbb61a88c8e64f5fa1ea5474caa76bd8740217a0055f8ef2067c9996ef262bc7d671651b533870b7be6860ebbf52fe0259fafb0296cdbe8dcdc85'
         '99d4f017a6d65e6d19830c25be94238812f2ceeaf9084a1b98c9f0b270d40889f518f5a158fb81e0cfc13364e10bd7febfe7ac429f87c8228b86858f031611e4'
         '409d74e0790de7f12a862f10bdf3a4ed87ea99fdc503ae1b5f70ad20aa0e56f2212f06429224572211cc36a782897fcc3d9f710a500f440ae4047d83321e83f1'
+        '055cd553c8794ed1a2c4ed75cf8e502aa32952d1c6e86d0af1f7c491e3d69c4b4e4f1bf8d36d66d988c4b62d556b165d3f8039a884549781b4e352c0e2da15af'
+        'be29265770f5211b33ed7c11b2f3e0aca7f3f35126baa93098d726d2156e75db05e4f28a543c641fd4e70e5bfc011f90f214c3b59d91bd539965769f582d7699'
+        '36ad429ae3b4beb79eee205d636f6ff5b8ddcf62d7b2c79ca964a37c422b904cc49861d2e8456243bd86998cbac128edc1d332ae16f26aca9a660af2a32bb44f'
+        '43017b82120e34b4b49169676a99fc09a1b6f5047466840f148244ef275154b70eaf50c1a099d6cdeabf6707717cc0eddb82d3b507b8da7f2aabd7dcc47accf4'
+        '75c35a39a535089ded9cb60ae5c99d85e836242b6d6b0049c4828adbee6b3264c2dc5abc11387eba03f19fdde0a9b3e7fdc72578af4ed8fcf2a5ff7b06948c0e'
+        '2ab83c715e65468a8a8486584479fbb5530b727c499492755d135fb563c8e9bcc66ce1188c4ad5dfcadad1e7e2d30385134a7d9354b7e19486849c55c06d2ba4'
         '2696398d441108697949e5cab79e19ec09ae642775be439b72105263a64b0817ff7115d2c38521775217558d39e64dbba51acba1ed347fa16170c9693f6d483d'
         'ab72ea6ff3192d7b64daea92df18418664e9ade9d337f88b270ab2559223ac6087dff8c1f2a5083ec7598a3331596a18e93d812025c6929d45ca745926ac90e9'
         'bafcf6d2da7aee5ad8acd59661ca47512b58bfefba8efa9f57a6d0ca3c3e2784b3d47b8f16d3d0bd0c0d6b7cd21a6bb698f97db83d16f12a458f0dd1f7e3a69b'
@@ -69,29 +81,29 @@ b2sums=('037e32e0de20eaffab5e53b3528e18925435574813f65be4567e583de2b3e06b9d1b114
         'b35447ad749d8acfdfeb100ad347e7278c358b33da527adc12137f47630ce503c2da0edd611d664b44da6e88c2d43ab721c2db97e22057e06a516aca30f0e358'
         'cb0fcffaf336f176ef27e32682c0c66421a9065bea3905c3c681efed549b4c31ed5ff560564390c32f043f35cfb9f8527b95e3794e5ef166a08ab1673fa41de5'
         'baee58367325f4046ddca758cb6da82e4ca9d8e0923369125ca89539dc1103a5a00a1fa01dc9a12883c19cec827fae1071642cc0b8a00cf3b5c24f18638ad645'
-        'bf9586b0932821e3f7d5890498e5a10e69e15bcb87b153bd7c84b4004d30caedd8cfd10e2551d39cf705ebaa2c781f8ec30fdf81dc61681d891d0fa1379dcbd8'
+        '7279bf20a866906ad036f3a1fb5f7871439a84feef1fa5bd71b4f5c31c7dfbead4fabe9c887c479942cb554131a0f97ec15e81308180225a7c857cafe42f4b78'
         'ae5c0780657201759f27115f3f215f43b0520d1cb30c44805610694cdc947645f782568e9fa02ff1c09afe35606e9e63dc11bdb404c509cc4b5f7645b09142c1'
         '444c5e378bb375fa5365ca7218ab0e60df65c73f3bef38a25fa4e1b69fecd62435987d7ad29dcf1b59b56b4db1c89da057a401e948bf696cc0a06e0892db0b88'
         '6aa6c65ef7e21d20965491fb95c94b16e7e67ffa072f401a70f1570ae5d80b3248523c6ef2ef1f9ba3db0c0371081bdb07b5ecea3429cf47a0f00f727b45bf7d'
         'd5a5ca5ba29f46339504899e9471f3b8eeded8018b26b542802c1f0f612f01ba662f4fad7fa058d2bf7b8ef64b4f70a1a56e3293f644cb7c22d64bab3f04ade9'
         '8bc3c6adf182ff379e34cbb78b727e341e03d2718cf2d411751717dd346987f52e02a7a870fb92d21a176e3f752f06aafbe5e49571ab540951326ab1b25188f5'
-        'ee052c02f88d63a8192a4672861b1e3d74f94360da1213563fa88da27338b8e17d26e31a686569026c9b5086fe4c4bbbfc48b39d39e685e0cf552bb3b9bddf37'
+        '19d1b79916bea592fd9bbe841d063a53eabcd1bb0020a39bd78d445249d9db285c192a897364e0b91aecf2e4b0fe881149add8c3689d06a13e6b553beb404a14'
         'd144a325cb08a4bc5527043f2d402ced6d63997b234d6cab83113944d1ae4d8ddc64ec545222bf7f859e9e37a925b8f3300a568daca7d91bef1f0bb5cfab03c7')
 
 prepare() {
   cd $_srcname
 
   local src
-  for src in $(ls ../linux-*.patch); do
-    echo "Applying patch $src..."
-    patch -Np1 <"../$src"
-  done
-
   for src in $(ls --sort=version ../patch-*.xz); do
     echo "Applying patch $src..."
     xzcat "../$src" | patch -Np1
   done
 
+  for src in $(ls ../linux-*.patch); do
+    echo "Applying patch $src..."
+    patch -Np1 <"../$src"
+  done
+  unset src
 
   echo "Setting version..."
   echo "-${_variant}" >localversion.10-variant

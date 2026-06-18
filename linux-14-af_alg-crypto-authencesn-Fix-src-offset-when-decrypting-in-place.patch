@@ -1,0 +1,55 @@
+Subject: [PATCH 6.12 7/8] crypto: authencesn - Fix src offset when decrypting in-place
+Date: Wed, 29 Apr 2026 23:07:01 -0700
+Message-ID: <20260430060702.110091-8-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260430060702.110091-1-ebiggers@kernel.org>
+References: <20260430060702.110091-1-ebiggers@kernel.org>
+Precedence: bulk
+X-Mailing-List: stable@vger.kernel.org
+List-Id: <stable.vger.kernel.org>
+List-Subscribe: <mailto:stable+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:stable+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+From: Herbert Xu <herbert@gondor.apana.org.au>
+
+commit 1f48ad3b19a9dfc947868edda0bb8e48e5b5a8fa upstream.
+
+The src SG list offset wasn't set properly when decrypting in-place,
+fix it.
+
+Reported-by: Wolfgang Walter <linux@stwm.de>
+Fixes: e02494114ebf ("crypto: authencesn - Do not place hiseq at end of dst for out-of-place decryption")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ crypto/authencesn.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index 257af38ac4de..c01cc3087919 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -226,13 +226,15 @@ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
+ 	if (crypto_memneq(ihash, ohash, authsize))
+ 		return -EBADMSG;
+ 
+ decrypt:
+ 
+-	if (src != dst)
+-		src = scatterwalk_ffwd(areq_ctx->src, src, assoclen);
+ 	dst = scatterwalk_ffwd(areq_ctx->dst, dst, assoclen);
++	if (req->src == req->dst)
++		src = dst;
++	else
++		src = scatterwalk_ffwd(areq_ctx->src, src, assoclen);
+ 
+ 	skcipher_request_set_tfm(skreq, ctx->enc);
+ 	skcipher_request_set_callback(skreq, flags,
+ 				      req->base.complete, req->base.data);
+ 	skcipher_request_set_crypt(skreq, src, dst, cryptlen, req->iv);
+-- 
+2.54.0
+
+

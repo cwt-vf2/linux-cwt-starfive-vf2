@@ -8,4 +8,4 @@ Target = linux-cwt-6.12-starfive-vf2-soft_3rdpart
 [Action]
 Description = Updating linux initcpios...
 When = PostTransaction
-Exec = /bin/bash -c "/usr/bin/depmod -a 6.12.18-cwt-6.0.0-2"
+Exec = /bin/bash -c "/usr/bin/depmod -a 6.12.18-cwt-6.0.0-3"
